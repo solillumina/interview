@@ -1,14 +1,124 @@
-JS
+# JS: Call Stack vs Event Loop
 
+- Call Stack
+  - เก็บ function calls ที่กำลัง execute
+  - js รัน synchronous code ทีละคำสั่ง
+  - ถ้า function ใช้เวลานานจะ block คำสั่งอื่นๆ
+- Event Loop
+  - คอยเช็คว่า Call Stack ว่างหรือยัง
+  - รัน 1 Marcrotask แบบ FIFO (First In First Out)
+    - Macrotask เช่น sync code (code แรกที่สามารถรันได้เลยถือเป็น macrotask และเป็นเหตุผลที่ทำใมการ setTimeout หรือ setInterval รันทีหลังแม้จะเป็น Macrotask), setTimeout, setInterval, I/O และ UI events
+  - ถ้า stack ว่างจะนำ callback จาก Microtasks queue มารันบน Call Stack แบบ drain (รันจนกว่าจะหมด queue)
+    - Microtasks เช่น Promise, then, catch, finally และ async function
+  - Rerender UI (ถ้ามี)
+  - วน loop
 
+# JS: Memory
+
+- Stack memory
+  - LIFO (Last In First Out)
+  - รวดเร็ว
+  - Live แค่ใน scope เมื่อออกจาก scope จะคืน memory
+  - ใช้เก็บ primitive value และ reference ที่ชี้ไปยัง object ใน Heap memory
+- Heap memory
+  - ช้ากว่า stack
+  - ใช้เก็บ object เช่น object, array, function
+  - GC (Gabage Collector) จะคืน memory ของ object ใดๆเมื่อไม่มี reference ใดๆจาก Stack memory ที่ชี้มายัง object นั้นๆ
+
+# JS: Bundler
+
+- เป็นเครื่องเมื่อที่รวมไฟล์ js หลายๆไฟล์เข้าด้วยกัน โดยอาจจะมีการทำ minimize เพื่อลดขนาด script และ tree shaking เพื่อลด code ที่ไม่ได้ใช้งานออกจาก bundles ตัวอย่าง Bundler เช่น Webpack, Vite และ Turbo pack
+- Single Bundle vs Multiple Bundles
+  - Single Bundle
+    - รวมเป็นไฟล์เดียว
+    - ไฟล์จะค่อนข้างใหญ่
+    - ติดตั้งง่าย
+    - เหมาะกับแอพขนาดเล็ก
+    - เนื่องจากไฟล์ใหญ่ทำให้โหลดช้า
+    - ต้องโหลด code ทั้งหมดทั้งที่ใช้ และไม่ได้ใช้ ก่อนจะใช้งานได้
+    - ใช้งานร่วมกับ cache ยาก โดยเมื่อการแก้ไข code บางส่วนต้องทำการอัปเดต bundle และ invalidate cache
+  - Multiple Bundles
+    - แยกเป็นไฟล์เล็กๆ ย่อยๆ
+    - cache ง่าย
+    - โหลดไว
+    - โหลดเฉพาะ code ที่ต้องการได้
+    - ทำ lazy load ได้
+    - จัดการยาก
+    - config ซับซ้อนกว่า
+    - หากกำหนดให้มีหลาย bundles อาจจะมี overhead เยอะ (request -> load -> execute)
+      - ปัจจุบัน HTTP1.2 และ 1.3 สามารถ reuse connection โหลด website content ได้โดยไม่ต้องเปิด connection ใหม่ทำให้ overhead ในส่วนของ HTTP 3-way handshake ลดลงไป
+
+# JS: script tag
+
+- กรณีวาง script ไว้ส่วนไหนของ html จะมีผลทำให้ html หยุดการ parse HTML และรอจนรัน script สำเร็จส่งผลให้ตำแหน่งของ script มีผลกับการ render หน้าเว็บ
+- defer vs async
+  - defer
+    - โหลด JS ระหว่างที่ browser parse HTML (เมื่อ HTML อ่าน script tag ถึงเกิดการโหลด JS)
+    - ทำงานเมื่อ parse HTML แล้ว
+    - ทำงานตามลำดับแบบ FIFO (First In First Out)
+  - async
+    - โหลด JS ระหว่างที่ browser parse HTML (เมื่อ HTML อ่าน script tag ถึงเกิดการโหลด JS)
+    - ทำงานทันที่เมื่อโหลดเสร็จ ระหว่างนี้จะหยุดการ parse HTML
+    - ไม่รับประกันลำดับการทำงาน เนื่องจาก script ไหนโหลดเสร็จก่อนจะทำงานก่อน
+
+# JS: Map vs WeakMap and Set vs WeakSet
+
+- Map
+  - เก็บข้อมูลแบบ key-value
+  - Key เป็น value ชนิดใดก็ได้ เช่น string, number, object
+  - Loop data ได้
+  - เก็บข้อมูลเป็นลำดับ
+  - มีขนาดข้อมูลที่ชัดเจน
+  - key และ value จะยังถูกอ้างอิงอยู่ตราบใดที่ map object ยังถูกใช้งาน (สามารถเกิด memory leaks ได้ถ้าใช้ไม่ถูกต้อง)
+- WeakMap
+  - เก็บข้อมูลแบบ key-value
+  - Key ต้องเป็น object เท่านั้น
+  - Key อาจจะโดน GC คืน memory เมื่อไหร่ก็ได้ (weak reference)
+  - Loop data ไม่ได้
+  - ไม่ขนาดของข้อมูลที่แน่นอนเนื่องจาก Key อาจจะถูก GC คืน memory เมื่อไหร่ก็ได้
+- Set
+  - เก็บค่าที่ไม่ซ้ำกัน
+  - Value เป็นชนิดใดก็ได้
+  - Loop data ได้
+  - เก็บข้อมูลเป็นลำดับ
+  - มีขนาดข้อมูลที่ชัดเจน
+- WeakSet
+  - เก็บ object ที่ไม่ซ้ำกัน
+  - Value ต้องเป็น object เท่านั้น
+  - Value อาจจะโดน GC คืน memory เมื่อไหร่ก็ได้ (weak reference)
+  - Loop data ไม่ได้
+  - ไม่ขนาดของข้อมูลที่แน่นอนเนื่องจาก Key อาจจะถูก GC คืน memory เมื่อไหร่ก็ได้
 
 # JS: ES6 ECMAScript2015
-- Arrow Function (=>) 
-```javascriptconst sum = (a, b) => a+b```
-- Default Parameters function sum(a, b = 10){ return a+b }
-- Spread Operator function fn(...args){}
-- Rest Parameters (...args) const { id, ...rest } = user
-- Destructure Object const { id } = user
-- Template Literals Hello ${username} using (`)
-- Tagged Template Literals 
-```javascript function sql(strings, values){}  -> sqlHello ${username} using (`)```
+
+- Arrow Function (=>)
+  ```js
+  const sum = (a, b) => a + b;
+  ```
+- Default Parameters
+  ```js
+  function sum(a, b = 10) {
+    return a + b;
+  }
+  ```
+- Spread Operator
+  ```js
+  function fn(...args) {}
+  ```
+- Rest Parameters (...args)
+  ```js
+  const { id, ...rest } = user;
+  ```
+- Destructure Object
+  ```js
+  const { id } = user;
+  ```
+- Template Literals
+  ```js
+  `Hello ${username}`;
+  ```
+- Tagged Template Literals
+  ```js
+  function sql(strings, values) {}
+  sqlHello`${username}`;
+  ```
