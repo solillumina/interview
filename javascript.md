@@ -56,7 +56,7 @@
     - จัดการยาก
     - config ซับซ้อนกว่า
     - หากกำหนดให้มีหลาย bundles อาจจะมี overhead เยอะ (request -> load -> execute)
-      - ปัจจุบัน HTTP1.2 และ 1.3 สามารถ reuse connection โหลด website content ได้โดยไม่ต้องเปิด connection ใหม่ทำให้ overhead ในส่วนของ HTTP 3-way handshake ลดลงไป
+      - ปัจจุบัน HTTP/2 และ HTTP/3 สามารถ reuse connection โหลด website content ได้โดยไม่ต้องเปิด connection ใหม่ทำให้ overhead ในส่วนของ HTTP 3-way handshake ลดลงไป
 
 # JS: script tag
 
