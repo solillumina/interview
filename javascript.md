@@ -58,19 +58,6 @@
     - หากกำหนดให้มีหลาย bundles อาจจะมี overhead เยอะ (request -> load -> execute)
       - ปัจจุบัน HTTP/2 และ HTTP/3 สามารถ reuse connection โหลด website content ได้โดยไม่ต้องเปิด connection ใหม่ทำให้ overhead ในส่วนของ HTTP 3-way handshake ลดลงไป
 
-# JS: script tag
-
-- กรณีวาง script ไว้ส่วนไหนของ html จะมีผลทำให้ html หยุดการ parse HTML และรอจนรัน script สำเร็จส่งผลให้ตำแหน่งของ script มีผลกับการ render หน้าเว็บ
-- defer vs async
-  - defer
-    - โหลด JS ระหว่างที่ browser parse HTML (เมื่อ HTML อ่าน script tag ถึงเกิดการโหลด JS)
-    - ทำงานเมื่อ parse HTML แล้ว
-    - ทำงานตามลำดับแบบ FIFO (First In First Out)
-  - async
-    - โหลด JS ระหว่างที่ browser parse HTML (เมื่อ HTML อ่าน script tag ถึงเกิดการโหลด JS)
-    - ทำงานทันที่เมื่อโหลดเสร็จ ระหว่างนี้จะหยุดการ parse HTML
-    - ไม่รับประกันลำดับการทำงาน เนื่องจาก script ไหนโหลดเสร็จก่อนจะทำงานก่อน
-
 # JS: Map vs WeakMap and Set vs WeakSet
 
 - Map
