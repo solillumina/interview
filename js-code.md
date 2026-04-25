@@ -1,15 +1,3 @@
-# JS: Fetch file as FormData
-
-```js
-const formData = new FormData(); // Require header Content-Type: multipart/form-data (fetch will auto set the header)
-formData.append("file", e.target.files[0]);
-// formData.append("file", e.target.files[1]); // Can set multiple file like this
-fetch("https://example.com/api/upload", {
-  method: "POST",
-  body: formData,
-});
-```
-
 # JS: Read file
 
 ```js
@@ -27,6 +15,54 @@ reader.onload = () => {
 reader.readAsText(e.target.files[0]);
 // reader.readAsArrayBuffer(e.target.files[0]); // Array buffer
 // reader.readAsDataURL(e.target.files[0]); // Base64
+```
+
+# JS: Read file
+
+```js
+const reader = e.target.files[0]
+  .stream()
+  .pipeThrough(new TextDecoderStream()) // Default "utf-8"
+  .getReader();
+
+let text = "";
+
+while (true) {
+  const { value, done } = await reader.read();
+  if (done) break;
+
+  text += value;
+}
+```
+
+# JS: Fetch send file using FormData
+
+```js
+const formData = new FormData(); // Require header Content-Type: multipart/form-data (fetch will auto set the header)
+formData.append("file", e.target.files[0]);
+// formData.append("file", e.target.files[1]); // Can set multiple file like this
+fetch("https://example.com/api/upload", {
+  method: "POST",
+  body: formData,
+});
+```
+
+# JS: Fetch read response stream
+
+```js
+const reader = fetchResponse.body.getReader();
+const decoder = new TextDecoder("utf-8");
+let text = "";
+
+while (true) {
+  const { value, done } = await reader.read();
+  if (done) {
+    text += decoder.decode(); // Get all remaining data in buffer
+    break;
+  }
+
+  text += decoder.decode(value, { stream: true });
+}
 ```
 
 # NodeJS: Handle Post
@@ -52,6 +88,8 @@ const node = http.createServer((req, res) => {
         res.end("Invalid JSON");
       }
     });
+
+    req.on("error", () => {});
   }
 });
 
