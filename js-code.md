@@ -10,6 +10,25 @@ fetch("https://example.com/api/upload", {
 });
 ```
 
+# JS: Read file
+
+```js
+const text = await e.target.files[0].text();
+// await e.target.files[0].text()
+// await e.target.files[0].byte() // Uint8Array (1 byte per index)
+// await e.target.files[0].arrayBuffer() // Fix length binary
+
+// Old way
+const reader = new FileReader();
+let text2 = "";
+reader.onload = () => {
+  text2 = reader.result;
+};
+reader.readAsText(e.target.files[0]);
+// reader.readAsArrayBuffer(e.target.files[0]); // Array buffer
+// reader.readAsDataURL(e.target.files[0]); // Base64
+```
+
 # NodeJS: Handle Post
 
 ```js
