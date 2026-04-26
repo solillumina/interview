@@ -92,7 +92,7 @@
   - เก็บข้อมูลขนาดเล็กเป็น string แบบ key-value
   - Browser จะส่ง cookie ที่ตรงกับ domain/path ไปกับ HTTP request อัตโนมัติ เมื่อกำหนดให้ส่ง credential ไปด้วยที่ requester
   - ใช้ได้ข้าม tabs/windows ภายใต้ origin/domain ที่กำหนด
-  - กำหนดอายุได้ด้วย `Max-Age`
+  - กำหนดอายุได้ด้วย `Max-Age` หรือ `Expires`
   - ป้องกันการอ่านจาก JS ได้ด้วย `HttpOnly`
   - เพิ่มความปลอดภัยได้ด้วย `Secure` และ `SameSite`
 - Session
