@@ -51,3 +51,38 @@ DOM + CSSOM → Render Tree → Style → Layout → Paint → Composite
   - รวม layers แล้วแสดงผลบน screen
   - รวม painted layers เป็นภาพสุดท้ายบนหน้าจอ
   - style เช่น `transform` และ `opacity` มัก composite ได้โดยไม่ต้อง layout/reflow
+
+# Cookie vs Session vs LocalStorage
+
+- Cookie
+  - เก็บข้อมูลขนาดเล็กเป็น string แบบ key-value
+  - Browser จะส่ง cookie ที่ตรงกับ domain/path ไปกับ HTTP request อัตโนมัติ เมื่อกำหนดให้ส่ง credential ไปด้วยที่ requester
+  - ใช้ได้ข้าม tabs/windows ภายใต้ origin/domain ที่กำหนด
+  - กำหนดอายุได้ด้วย `Max-Age` หรือ `Expires`
+  - ป้องกันการอ่านจาก JS ได้ด้วย `HttpOnly`
+  - เพิ่มความปลอดภัยได้ด้วย `Secure` และ `SameSite`
+- Session
+  - เป็นข้อมูลฝั่ง server ที่ผูกกับ user/session หนึ่ง ๆ
+  - มักทำงานร่วมกับ cookie โดยเก็บ `sessionId` ไว้ใน cookie
+  - เมื่อ server ล่ม session จะหายไปตาม server
+  - สามารถเก็บ session ไว้ใน database หรือ cache เพื่อแชร์ session ระหว่าง node หรือป้องกัน session หายไปเมื่อ service ล่ม และสามารถทำให้ scale ได้
+- LocalStorage
+  - เก็บข้อมูลใน browser เป็น key-value string
+  - ข้อมูลอยู่ถาวรจนกว่าจะถูกลบ
+  - ใช้ร่วมกันได้ทุก tabs/windows ของ origin เดียวกัน
+  - ไม่ถูกส่งไปกับ HTTP request อัตโนมัติ
+  - JS อ่านได้จึงไม่ควรเก็บ sensitive data
+
+# JWT vs Session
+
+- Session
+  - เก็บสถานะผู้ใช้ไว้ฝั่ง server
+  - client มักจะได้แค่ session id ผ่าน cookie
+  - ควบคุม logout / revoke / expire ง่าย
+  - เหมาะกับระบบที่มี stateful server หรือต้องการ security สูง
+  - server lookup session จากฐานข้อมูล / cache ทุกครั้งหากต้องการให้ session ID persist และ share ระหว่าง node
+- JWT
+  - token เป็น self-contained payload ที่เซ็นด้วย secret/keys
+  - server ไม่ต้องเก็บ state สามารุใช้แบบ stateless ได้
+  - client ต้องส่ง JWT token เองโดยมักจะส่งผ่าน Authorization header
+  - client อ่านข้อมูลจาก token ได้เลย ดังนั้นจึงไม่ควรเก็บ sensitive data และไม่ควรเชื่อถือข้อมูลใน token ก่อนจะ verify
